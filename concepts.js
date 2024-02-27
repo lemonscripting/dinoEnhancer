@@ -15,22 +15,24 @@ modMenu.innerHTML = `
 <div class="page" id="page1">
     <div class="menu-item">
         <input type="checkbox" id="mod1">
-        <label for="mod1">Toggle Mod 1</label>
+        <label for="mod1">Immortality</label>
     </div>
+
     <div class="menu-item">
         <input type="checkbox" id="mod2">
-        <label for="mod2">Toggle Mod 2</label>
+        <label for="mod2">Sky Run</label>
     </div>
+
     <!-- Add more menu items for page 1 as needed -->
 </div>
 <div class="page" id="page2">
-    <div class="menu-item">
-        <input type="checkbox" id="mod3">
-        <label for="mod3">Toggle Mod 3</label>
-    </div>
+<div class="menu-item">
+<input type="checkbox" id="mod3">
+<label for="mod3">Sprint</label>
+</div>
     <div class="menu-item">
         <input type="checkbox" id="mod4">
-        <label for="mod4">Toggle Mod 4</label>
+        <label for="mod4">Auto Run</label>
     </div>
     <!-- Add more menu items for page 2 as needed -->
 </div>
@@ -160,6 +162,13 @@ style.textContent = `
     }
 `;
 
+//only use listed stylings
+/*
+modMenu.querySelectorAll('*').forEach(element => {
+    element.style.all = 'initial';
+});
+*/
+
 document.head.appendChild(style);
 
 const modMenuContainer = document.querySelector('.mod-menu');
@@ -211,7 +220,7 @@ function checkPassword() {
         var navbar = document.querySelector('.navbar');
         navbar.style.display = "block";
         var header = document.querySelector('.header');
-        header.textContent = "@lemonscripting: XXX V1";
+        header.textContent = "@lemonscripting: Dino V1";
         passwordPage.classList.remove('active');
         const pages = document.querySelectorAll('.page');
         pages.forEach(page => {
@@ -222,3 +231,83 @@ function checkPassword() {
         alert('USER OR DEVICE NOT REGISTERED');
     }
 }
+
+//source codes
+
+//predefined assets
+var original = Runner.prototype.gameOver
+
+function handleCheckbox1Change() {
+    if (document.getElementById('mod1').checked) {
+        Runner.prototype.gameOver = function () { }
+        console.log("immortality activated");
+    } else {
+        Runner.prototype.gameOver = original;
+        console.log("immortality deactivated");
+    }
+}
+
+function handleCheckbox2Change() {
+    if (document.getElementById('mod2').checked) {
+        Runner.instance_.tRex.groundYPos = 0;
+        console.log("sky run activated");
+    } else {
+        Runner.instance_.tRex.groundYPos = 93;
+        console.log("sky run activated");
+    }
+}
+
+function handleCheckbox3Change() {
+    if (document.getElementById('mod3').checked) {
+        Runner.instance_.setSpeed(1000)
+        console.log("sprint activated");
+    } else {
+        Runner.instance_.setSpeed(10)
+        console.log("sprint deactivated");
+    }
+}
+
+function handleCheckbox4Change() {
+    if (document.getElementById('mod4').checked) {
+        function dispatchKey(type, key) {
+            document.dispatchEvent(new KeyboardEvent(type, { keyCode: key }));
+        }
+
+        const AUTO_RUN = setInterval(function () {
+            const KEY_CODE_SPACE_BAR = 32
+            const KEY_CODE_ARROW_DOWN = 40
+            const CANVAS_HEIGHT = Runner.instance_.dimensions.HEIGHT
+            const DINO_HEIGHT = Runner.instance_.tRex.config.HEIGHT
+
+            const obstacle = Runner.instance_.horizon.obstacles[0]
+            const speed = Runner.instance_.currentSpeed
+
+            if (obstacle) {
+                const w = obstacle.width
+                const x = obstacle.xPos
+                const y = obstacle.yPos
+                const yFromBottom = CANVAS_HEIGHT - y - obstacle.typeConfig.height
+                const isObstacleNearby = x < 25 * speed - w / 2
+
+                if (isObstacleNearby) {
+                    if (yFromBottom > DINO_HEIGHT) {
+                    } else if (y > CANVAS_HEIGHT / 2) {
+                        dispatchKey("keyup", KEY_CODE_ARROW_DOWN)
+                        dispatchKey("keydown", KEY_CODE_SPACE_BAR)
+                    } else {
+                        dispatchKey("keydown", KEY_CODE_ARROW_DOWN)
+                    }
+                }
+            }
+        }, Runner.instance_.msPerFrame);
+        console.log("auto run activated");
+    } else {
+        clearInterval(AUTO_RUN);
+        console.log("auto run deactivated");
+    }
+}
+
+document.getElementById('mod1').addEventListener('change', handleCheckbox1Change);
+document.getElementById('mod2').addEventListener('change', handleCheckbox2Change);
+document.getElementById('mod3').addEventListener('change', handleCheckbox3Change);
+document.getElementById('mod4').addEventListener('change', handleCheckbox4Change);
